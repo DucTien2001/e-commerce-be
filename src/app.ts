@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan'
 import compression from 'compression'
+import router from './routes';
 // import * as mongooseConnection from './dbs/init.mongodb.lv0'
 // import instanceMongoDB from './dbs/init.mongodb'
 
@@ -23,5 +24,8 @@ app.use(compression()); // Dùng để giảm tải bộ nhớ khi response data
 // instanceMongoDB
 require('./dbs/init.mongodb')
 // checkOverload()
+
+// ========== init routes ==========
+app.use(router)
 
 export default app
