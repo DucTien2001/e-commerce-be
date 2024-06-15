@@ -23,7 +23,7 @@ class AccessService {
     // step1: check email exists??
     const hodelShop = await shopModel.findOne({ email }).lean();
     if (hodelShop) {
-      throw new BadRequestError('Error: Shop already registered!');
+      throw new BadRequestError('Shop already registered!');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);

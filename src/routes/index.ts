@@ -2,13 +2,14 @@
 
 import express from 'express';
 import accessRouter from './access.route';
+import { apiKey, permission } from '../auth/checkAuth';
 
 const router = express.Router();
 
 // Check apikey
-// router.use(apiKey);
+router.use(apiKey);
 // Check permission
-// router.use(permission('0000'));
+router.use(permission('0000'));
 
 // router.use('/v1/api/product', require('./product'));
 router.use('/v1/api', accessRouter);
