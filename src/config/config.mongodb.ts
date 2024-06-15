@@ -1,4 +1,7 @@
 'use strict';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // level 0
 // const config = {

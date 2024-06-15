@@ -13,7 +13,7 @@ const ReasonStatusCode = {
   CONFLIC: 'Conflic error',
 };
 
-class ErrorResponse extends Error {
+export class ErrorResponse extends Error {
   status: number;
   constructor(message: string, status: number) {
     super(message);
@@ -21,7 +21,7 @@ class ErrorResponse extends Error {
   }
 }
 
-class ConflicRequestError extends ErrorResponse {
+export class ConflicRequestError extends ErrorResponse {
   constructor(
     message = ReasonStatusCode.CONFLIC,
     statusCode = StatusCode.FORBIDDEN
@@ -30,7 +30,7 @@ class ConflicRequestError extends ErrorResponse {
   }
 }
 
-class BadRequestError extends ErrorResponse {
+export class BadRequestError extends ErrorResponse {
   constructor(
     message = ReasonStatusCode.CONFLIC,
     statusCode = StatusCode.FORBIDDEN
@@ -39,7 +39,7 @@ class BadRequestError extends ErrorResponse {
   }
 }
 
-class AuthFailureError extends ErrorResponse {
+export class AuthFailureError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.UNAUTHORIZED,
     statusCode = StatusCodes.UNAUTHORIZED
@@ -48,7 +48,7 @@ class AuthFailureError extends ErrorResponse {
   }
 }
 
-class NotFoundError extends ErrorResponse {
+export class NotFoundError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.NOT_FOUND,
     statusCode = StatusCodes.NOT_FOUND
@@ -57,7 +57,7 @@ class NotFoundError extends ErrorResponse {
   }
 }
 
-class ForbiddenError extends ErrorResponse {
+export class ForbiddenError extends ErrorResponse {
   constructor(
     message = ReasonPhrases.FORBIDDEN,
     statusCode = StatusCodes.FORBIDDEN
@@ -65,11 +65,3 @@ class ForbiddenError extends ErrorResponse {
     super(message, statusCode);
   }
 }
-
-export default {
-  ConflicRequestError,
-  BadRequestError,
-  AuthFailureError,
-  NotFoundError,
-  ForbiddenError,
-};
