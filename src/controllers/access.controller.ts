@@ -35,22 +35,26 @@ class AccessController {
     }).send(res);
   };
 
-  // handleRefreshToken = async (req, res, next) => {
-  //   // new SuccessResponse({
-  //   //   message: 'Get token success',
-  //   //   metadata: await AccessService.handleRefreshToken(req.body.refreshToken),
-  //   // }).send(res);
+  handleRefreshToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    new SuccessResponse({
+      message: 'Get token success',
+      metadata: await AccessService.handleRefreshToken(req.body.refreshToken),
+    }).send(res);
 
-  //   // v2 fixed
-  //   new SuccessResponse({
-  //     message: 'Get token success',
-  //     metadata: await AccessService.handleRefreshTokenV2({
-  //       refreshToken: req.refreshToken,
-  //       user: req.user,
-  //       keyStore: req.keyStore,
-  //     }),
-  //   }).send(res);
-  // };
+    // v2 fixed
+    // new SuccessResponse({
+    //   message: 'Get token success',
+    //   metadata: await AccessService.handleRefreshTokenV2({
+    //     refreshToken: req.refreshToken,
+    //     user: req.user,
+    //     keyStore: req.keyStore,
+    //   }),
+    // }).send(res);
+  };
 }
 
 export default new AccessController();

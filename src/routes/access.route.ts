@@ -13,9 +13,9 @@ accessRouter.post('/shop/login', asyncHandler(accessController.login));
 // authentication
 accessRouter.use(authenticationV2);
 accessRouter.post('/shop/logout', asyncHandler(accessController.logout));
-// router.post(
-//   '/shop/refresh-token',
-//   asyncHandler(accessController.handleRefreshToken)
-// );
+accessRouter.post(
+  '/shop/refresh-token',
+  asyncHandler(accessController.handleRefreshToken)
+);
 
 export default accessRouter;

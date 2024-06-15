@@ -67,19 +67,19 @@ class KeyTokenService {
     return await keytokenModel.deleteOne(id);
   };
 
-  // static findByRefreshTokenUsed = async (refreshToken) => {
-  //   return await keytokenModel
-  //     .findOne({ refreshTokensUsed: refreshToken })
-  //     .lean();
-  // };
+  static findByRefreshTokenUsed = async (refreshToken: string) => {
+    return await keytokenModel
+      .findOne({ refreshTokensUsed: refreshToken })
+      .lean();
+  };
 
-  // static findByRefreshToken = async (refreshToken) => {
-  //   return await keytokenModel.findOne({ refreshToken });
-  // };
+  static findByRefreshToken = async (refreshToken: string) => {
+    return await keytokenModel.findOne({ refreshToken });
+  };
 
-  // static deleteKeyById = async (userId) => {
-  //   return await keytokenModel.deleteOne({ user: userId });
-  // };
+  static deleteKeyById = async (userId: Types.ObjectId) => {
+    return await keytokenModel.deleteOne({ user: userId });
+  };
 }
 
 export default KeyTokenService;
