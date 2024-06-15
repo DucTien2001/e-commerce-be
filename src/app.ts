@@ -47,7 +47,7 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   return res.status(statusCode).json({
     status: 'error',
     code: statusCode,
-    stack: error.stack,
+    stack: error.stack, //hiện dòng này để dễ debug, khi đưa vào product thì comment cái này lại
     message: error.message || 'Internal Server Error',
   });
 });

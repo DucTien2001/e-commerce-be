@@ -20,18 +20,20 @@ class AccessController {
     }).send(res);
   };
 
-  // login = async (req, res, next) => {
-  //   new SuccessResponse({
-  //     metadata: await AccessService.login(req.body),
-  //   }).send(res);
-  // };
+  login = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      metadata: await AccessService.login(req.body),
+    }).send(res);
+  };
 
-  // logout = async (req, res, next) => {
-  //   new SuccessResponse({
-  //     message: 'Logout success',
-  //     metadata: await AccessService.logout({ keyStore: req.keyStore }),
-  //   }).send(res);
-  // };
+  logout = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: 'Logout success',
+      metadata: await AccessService.logout({
+        keyStore: (req as any)?.keyStore,
+      }),
+    }).send(res);
+  };
 
   // handleRefreshToken = async (req, res, next) => {
   //   // new SuccessResponse({

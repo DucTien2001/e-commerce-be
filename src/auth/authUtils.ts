@@ -2,6 +2,9 @@
 
 import JWT from 'jsonwebtoken';
 import asyncHandler from '../helpers/asyncHandler';
+import { Request, Response, NextFunction } from 'express';
+import { AuthFailureError, NotFoundError } from '../core/error.response';
+import KeyTokenService from '../services/keyToken.service';
 // import { findByUserId } from '../services/keyToken.service';
 
 const HEADER = {
@@ -73,52 +76,63 @@ export const createTokenPair = async (
 //   }
 // });
 
-// const authenticationV2 = asyncHandler(async (req, res, next) => {
-//   /*
-//     1 - check userId missing
-//     2 - get access token
-//     3 - verify token
-//     4 - check user in dbs
-//     5 - check keystore with this user
-//     6 - OK all -> return next()
-//   */
-//   //  1
-//   const userId = req.headers[HEADER.CLIENT_ID];
-//   if (!userId) throw new AuthFailureError('Invalid Request');
+export const authenticationV2 = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    /*
+    1 - check userId missing
+    2 - get access token
+    3 - verify token
+    4 - check user in dbs
+    5 - check keystore with this user
+    6 - OK all -> return next()
+  */
+    //  1
+    const userId = req.headers[HEADER.CLIENT_ID];
+    if (!userId) throw new AuthFailureError('Invalid Request');
 
-//   // 2
-//   const keyStore = await findByUserId(userId);
-//   if (!keyStore) throw new NotFoundError('Not found keyStore');
+    // 2
+    const keyStore = await KeyTokenService.findByUserId(userId as string);
+    if (!keyStore) throw new NotFoundError('Not found keyStore');
 
-//   // 3
-//   if (req.headers[HEADER.REFRESHTOKEN]) {
-//     try {
-//       const refreshToken = req.headers[HEADER.REFRESHTOKEN];
-//       const decodeUser = JWT.verify(refreshToken, keyStore.privateKey);
-//       if (userId !== decodeUser.userId)
-//         throw new AuthFailureError('Invalid Request');
-//       req.keyStore = keyStore;
-//       req.user = decodeUser;
-//       req.refreshToken = refreshToken;
-//       return next();
-//     } catch (error) {
-//       throw error;
-//     }
-//   }
-//   const accessToken = req.headers[HEADER.AUTHORIZATION];
-//   if (!accessToken) throw new AuthFailureError('Invalid Request');
+    // 3,4,5,6
 
-//   try {
-//     const decodeUser = JWT.verify(accessToken, keyStore.publicKey);
-//     if (userId !== decodeUser.userId)
-//       throw new AuthFailureError('Invalid Request');
-//     req.keyStore = keyStore;
-//     req.user = decodeUser;
-//     return next();
-//   } catch (error) {
-//     throw error;
-//   }
-// });
+    if (req.headers[HEADER.REFRESHTOKEN]) {
+      try {
+        const refreshToken = req.headers[HEADER.REFRESHTOKEN];
+        if (!refreshToken) throw new AuthFailureError('Invalid Request');
+        const decodeUser: any = JWT.verify(
+          refreshToken as string,
+          keyStore.privateKey
+        );
+        if (userId !== decodeUser.userId)
+          throw new AuthFailureError('Invalid Request');
+        (req as any).keyStore = keyStore;
+        (req as any).user = decodeUser;
+        (req as any).refreshToken = refreshToken;
+        return next();
+      } catch (error) {
+        throw error;
+      }
+    }
+
+    const accessToken = req.headers[HEADER.AUTHORIZATION];
+    if (!accessToken) throw new AuthFailureError('Invalid Request');
+
+    try {
+      const decodeUser: any = JWT.verify(
+        accessToken as string,
+        keyStore.publicKey
+      );
+      if (userId !== decodeUser.userId)
+        throw new AuthFailureError('Invalid Request');
+      (req as any).keyStore = keyStore;
+      (req as any).user = decodeUser;
+      return next();
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
 export const verifyJWT = async (token: string, keySecret: string) => {
   return await JWT.verify(token, keySecret);

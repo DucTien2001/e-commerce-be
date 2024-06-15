@@ -6,15 +6,17 @@ import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
 import { createTokenPair } from '../auth/authUtils';
 // import { getInfoData } from '../utils';
-import { TShopSignUp } from '../interfaces/types';
+import { TShopLogin, TShopLogout, TShopSignUp } from '../interfaces/types';
 import KeyTokenService from './keyToken.service';
 import { getInfoData } from '../utils';
 import {
   BadRequestError,
   AuthFailureError,
   ForbiddenError,
+  InternalServerError,
 } from '../core/error.response';
 import { EShopRole } from '../interfaces';
+import ApiShopService from './shop.service';
 // const { findByEmail } = require('./shop.service');
 
 class AccessService {
@@ -105,48 +107,53 @@ class AccessService {
     4 - generate tokens
     5 - get data return login
   */
-  // static login = async ({ email, password, refreshToken = null }) => {
-  //   console.log(email, password, '==email, password==');
-  //   // 1
-  //   const foundShop = await findByEmail({ email });
-  //   console.log(foundShop, '==foundShop=_');
-  //   if (!foundShop) throw new BadRequestError('Shop is not registered');
+  static login = async ({
+    email,
+    password,
+    refreshToken = null,
+  }: TShopLogin) => {
+    // 1
+    const foundShop = await ApiShopService.findByEmail({ email });
+    if (!foundShop) throw new BadRequestError('Shop is not registered');
 
-  //   // 2
-  //   const match = bcrypt.compare(password, foundShop.password);
-  //   if (!match) throw new AuthFailureError('Authentication error');
+    // 2
+    const match = bcrypt.compare(password, foundShop.password);
+    if (!match) throw new AuthFailureError('Authentication error');
 
-  //   // 3
-  //   const privateKey = crypto.randomBytes(64).toString('hex');
-  //   const publicKey = crypto.randomBytes(64).toString('hex');
+    // 3
+    const privateKey = crypto.randomBytes(64).toString('hex');
+    const publicKey = crypto.randomBytes(64).toString('hex');
 
-  //   // 4
-  //   const tokens = await createTokenPair(
-  //     { userId: foundShop._id, email },
-  //     publicKey,
-  //     privateKey
-  //   );
+    // 4
+    const tokens = await createTokenPair(
+      { userId: foundShop._id, email },
+      publicKey,
+      privateKey
+    );
 
-  //   await KeyTokenService.createKeyToken({
-  //     userId: foundShop._id,
-  //     refreshToken: tokens.refreshToken,
-  //     privateKey,
-  //     publicKey,
-  //   });
-  //   return {
-  //     shop: getInfoData({
-  //       fields: ['_id', 'name', 'email'],
-  //       object: foundShop,
-  //     }),
-  //     tokens,
-  //   };
-  // };
+    if (!tokens) {
+      throw new InternalServerError('Error when creating tokens');
+    }
 
-  // static logout = async ({ keyStore }) => {
-  //   const delKey = KeyTokenService.removeKeyById(keyStore._id);
-  //   console.log(delKey, '==delKey===');
-  //   return delKey;
-  // };
+    await KeyTokenService.createKeyToken({
+      userId: foundShop._id,
+      refreshToken: tokens.refreshToken,
+      privateKey,
+      publicKey,
+    });
+    return {
+      shop: getInfoData({
+        fields: ['_id', 'name', 'email'],
+        object: foundShop,
+      }),
+      tokens,
+    };
+  };
+
+  static logout = async ({ keyStore }: TShopLogout) => {
+    const delKey = KeyTokenService.removeKeyById(keyStore._id);
+    return delKey;
+  };
 
   // /*
   //   1. check this token used?

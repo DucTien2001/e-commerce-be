@@ -12,7 +12,7 @@ const ReasonStatusCode = {
 };
 
 type TSuccessResponse = {
-  message: string;
+  message?: string;
   metadata: any;
   statusCode?: number;
   reasonStatusCode?: string;

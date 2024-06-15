@@ -65,3 +65,12 @@ export class ForbiddenError extends ErrorResponse {
     super(message, statusCode);
   }
 }
+
+export class InternalServerError extends ErrorResponse {
+  constructor(
+    message = ReasonPhrases.INTERNAL_SERVER_ERROR,
+    statusCode = StatusCodes.INTERNAL_SERVER_ERROR
+  ) {
+    super(message, statusCode);
+  }
+}

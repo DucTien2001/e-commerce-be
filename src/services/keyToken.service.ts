@@ -1,5 +1,6 @@
 'use strict';
 
+import { Types } from 'mongoose';
 import { TCreateKeyToken } from '../interfaces/types';
 import keytokenModel from '../models/keytoken.model';
 
@@ -58,13 +59,13 @@ class KeyTokenService {
     }
   };
 
-  // static findByUserId = async (userId) => {
-  //   return await keytokenModel.findOne({ user: userId });
-  // };
+  static findByUserId = async (userId: string) => {
+    return await keytokenModel.findOne({ user: userId });
+  };
 
-  // static removeKeyById = async (id) => {
-  //   return await keytokenModel.deleteOne(id);
-  // };
+  static removeKeyById = async (id: Types.ObjectId) => {
+    return await keytokenModel.deleteOne(id);
+  };
 
   // static findByRefreshTokenUsed = async (refreshToken) => {
   //   return await keytokenModel
