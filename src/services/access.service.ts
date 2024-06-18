@@ -6,7 +6,12 @@ import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
 import { createTokenPair, verifyJWT } from '../auth/authUtils';
 // import { getInfoData } from '../utils';
-import { TShopLogin, TShopLogout, TShopSignUp } from '../interfaces/types';
+import {
+  THandleRefreshTokenV2,
+  TShopLogin,
+  TShopLogout,
+  TShopSignUp,
+} from '../interfaces/types';
 import KeyTokenService from './keyToken.service';
 import { getInfoData } from '../utils';
 import {
@@ -16,7 +21,7 @@ import {
   InternalServerError,
 } from '../core/error.response';
 import { EShopRole } from '../interfaces';
-import ApiShopService from './shop.service';
+import ShopService from './shop.service';
 // const { findByEmail } = require('./shop.service');
 
 class AccessService {
@@ -113,7 +118,7 @@ class AccessService {
     refreshToken = null,
   }: TShopLogin) => {
     // 1
-    const foundShop = await ApiShopService.findByEmail({ email });
+    const foundShop = await ShopService.findByEmail({ email });
     if (!foundShop) throw new BadRequestError('Shop is not registered');
 
     // 2
@@ -183,7 +188,7 @@ class AccessService {
       holderToken.privateKey
     );
     // check user id
-    const foundShop = await ApiShopService.findByEmail({ email });
+    const foundShop = await ShopService.findByEmail({ email });
     if (!foundShop) throw new AuthFailureError('Shop not registered');
 
     // create a new pair token
@@ -212,41 +217,49 @@ class AccessService {
     };
   };
 
-  // static handleRefreshTokenV2 = async ({ keyStore, user, refreshToken }) => {
-  //   const { userId, email } = user;
-  //   if (keyStore.refreshTokensUsed.includes(refreshToken)) {
-  //     await KeyTokenService.deleteKeyById(userId);
-  //     throw new ForbiddenError('Something wrong happend! Please relogin');
-  //   }
+  static handleRefreshTokenV2 = async ({
+    keyStore,
+    user,
+    refreshToken,
+  }: THandleRefreshTokenV2) => {
+    const { userId, email } = user;
+    if ((keyStore?.refreshTokensUsed || []).includes(refreshToken)) {
+      await KeyTokenService.deleteKeyById(userId);
+      throw new ForbiddenError('Something wrong happend! Please relogin');
+    }
 
-  //   if (keyStore.refreshToken !== refreshToken)
-  //     throw new AuthFailureError('Shop not registered');
+    if (keyStore.refreshToken !== refreshToken)
+      throw new AuthFailureError('Shop not registered');
 
-  //   // check user id
-  //   const foundShop = await findByEmail({ email });
-  //   if (!foundShop) throw new AuthFailureError('Shop not registered');
+    // check user id
+    const foundShop = await ShopService.findByEmail({ email });
+    if (!foundShop) throw new AuthFailureError('Shop not registered');
 
-  //   // create a new pair token
-  //   const tokens = await createTokenPair(
-  //     { userId, email },
-  //     keyStore.publicKey,
-  //     keyStore.privateKey
-  //   );
-  //   // update token
-  //   await keyStore.updateOne({
-  //     $set: {
-  //       refreshToken: tokens.refreshToken,
-  //     },
-  //     $addToSet: {
-  //       refreshTokensUsed: refreshToken,
-  //     },
-  //   });
+    // create a new pair token
+    const tokens = await createTokenPair(
+      { userId, email },
+      keyStore.publicKey,
+      keyStore.privateKey
+    );
+    if (!tokens) {
+      throw new InternalServerError('Error when creating pair of tokens');
+    }
 
-  //   return {
-  //     user: { userId, email },
-  //     tokens,
-  //   };
-  // };
+    // update token
+    await keyStore.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken,
+      },
+    });
+
+    return {
+      user: { userId, email },
+      tokens,
+    };
+  };
 }
 
 export default AccessService;

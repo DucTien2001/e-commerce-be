@@ -1,7 +1,7 @@
 import { TShopFindByEmail } from '../interfaces/types';
 import shopModel from '../models/shop.model';
 
-export default class ApiShopService {
+export default class ShopService {
   static findByEmail = async ({
     email,
     select = {

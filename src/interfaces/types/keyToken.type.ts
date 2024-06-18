@@ -6,6 +6,7 @@ export type TKeyToken = {
   publicKey: string;
   privateKey: string;
   refreshToken?: string;
+  refreshTokensUsed?: string[]
   createdAt: NativeDate;
   updatedAt: NativeDate;
 };
