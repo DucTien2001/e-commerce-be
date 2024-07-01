@@ -67,7 +67,7 @@ var productSchema = new Schema(
       type: Boolean,
       default: true,
       index: true,
-      select: false,
+      select: false, // mỗi khi get ra thì sẽ không lấy những field có thuộc tính select = false
     },
     isPublished: {
       type: Boolean,
