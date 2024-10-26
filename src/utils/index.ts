@@ -1,6 +1,7 @@
 'use strict';
 
 import _ from 'lodash';
+import { Types } from 'mongoose';
 
 type TGetInfoData = {
   fields: string[];
@@ -45,3 +46,5 @@ export const updateNestedObjectParser = (obj: any) => {
 
   return final;
 };
+
+export const convertToObjectIdMongodb = (id: string) => new Types.ObjectId(id);

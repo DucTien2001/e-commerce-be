@@ -27,3 +27,11 @@ export type TUpdateProduct = {
   model: any;
   isNew?: boolean;
 };
+
+export type TProduct = {
+  productId: Types.ObjectId;
+  shopId: Types.ObjectId;
+  quantity: number;
+  name: string;
+  price: number;
+};

@@ -4,3 +4,4 @@ export * from './keyToken.type';
 export * from './shop.type';
 export * from './product.type';
 export * from './inventory.type';
+export * from './discount.type';
