@@ -90,7 +90,7 @@ class ProductService {
       sort,
       filter,
       page,
-      select: ['name', 'price', 'thumb'],
+      select: ['name', 'price', 'thumb', 'shop'],
     });
   }
 

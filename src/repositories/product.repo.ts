@@ -1,7 +1,5 @@
-'use strict';
+"use strict";
 
-import { Types } from 'mongoose';
-import productModel from '../models/product.model';
 import {
   TFind,
   TFindPagination,
@@ -10,8 +8,13 @@ import {
   TSearch,
   TUnPublishProductByShop,
   TUpdateProduct,
-} from '../interfaces';
-import { getSelectData, unGetSelectData } from '../utils';
+} from "../interfaces";
+import productModel from "../models/product.model";
+import {
+  convertToObjectIdMongodb,
+  getSelectData,
+  unGetSelectData,
+} from "../utils";
 
 export const finAllDraftsForShop = async ({ query, limit, skip }: TFind) => {
   return await queryProduct({ query, limit, skip });
@@ -29,9 +32,9 @@ export const searchProductByUser = async ({ keySearch }: TSearch) => {
         isPublished: true,
         $text: { $search: regexSearch as any },
       },
-      { score: { $meta: 'textScore' } }
+      { score: { $meta: "textScore" } }
     )
-    .sort({ score: { $meta: 'textScore' } })
+    .sort({ score: { $meta: "textScore" } })
     .lean();
   return results;
 };
@@ -44,7 +47,7 @@ export const findAllProducts = async ({
   select,
 }: TFindPagination) => {
   const skip = (page - 1) * limit;
-  const sortBy: any = sort === 'ctime' ? { _id: -1 } : { _id: 1 };
+  const sortBy: any = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   const products = await productModel
     .find(filter)
     .sort(sortBy)
@@ -112,10 +115,16 @@ export const unPublishProductByShop = async ({
 const queryProduct = async ({ query, limit, skip }: TFind) => {
   return await productModel
     .find(query)
-    .populate('shop', 'name email -_id')
+    .populate("shop", "name email -_id")
     .sort({ updateAt: -1 })
     .skip(skip)
     .limit(limit)
     .lean()
     .exec();
+};
+
+export const getProductById = async (productId: string) => {
+  return await productModel
+    .findOne({ _id: convertToObjectIdMongodb(productId) })
+    .lean();
 };

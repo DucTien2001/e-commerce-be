@@ -5,3 +5,4 @@ export * from './shop.type';
 export * from './product.type';
 export * from './inventory.type';
 export * from './discount.type';
+export * from './card.type';

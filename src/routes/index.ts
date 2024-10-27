@@ -4,6 +4,7 @@ import express from 'express';
 import accessRouter from './access.route';
 import productRouter from './product.route';
 import discountRouter from './discount.route';
+import cardRouter from './card.route';
 import { apiKey, permission } from '../auth/checkAuth';
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router.use(apiKey);
 router.use(permission('0000'));
 
 router.use('/v1/api/discount', discountRouter);
+router.use('/v1/api/card', cardRouter);
 router.use('/v1/api/product', productRouter);
 router.use('/v1/api', accessRouter);
 
