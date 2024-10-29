@@ -29,8 +29,8 @@ export type TUpdateProduct = {
 };
 
 export type TProduct = {
-  productId: Types.ObjectId;
-  shopId: Types.ObjectId;
+  productId: string;
+  shopId: string;
   quantity: number;
   name: string;
   price: number;

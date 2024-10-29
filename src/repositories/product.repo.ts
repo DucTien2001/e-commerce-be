@@ -4,6 +4,7 @@ import {
   TFind,
   TFindPagination,
   TFindProduct,
+  TProduct,
   TPublishProductByShop,
   TSearch,
   TUnPublishProductByShop,
@@ -127,4 +128,21 @@ export const getProductById = async (productId: string) => {
   return await productModel
     .findOne({ _id: convertToObjectIdMongodb(productId) })
     .lean();
+};
+
+export const checkProductByServer = async (
+  products: (Partial<TProduct> & { productId: string })[]
+) => {
+  return await Promise.all(
+    products.map(async (product) => {
+      const foundProduct = await getProductById(product.productId);
+      if (foundProduct) {
+        return {
+          price: foundProduct.price || 0,
+          quantity: product.quantity || 0,
+          productId: foundProduct._id,
+        };
+      }
+    })
+  );
 };

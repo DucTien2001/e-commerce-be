@@ -4,6 +4,7 @@ import {
   TUpdateUserCardQuantity,
 } from "../interfaces";
 import cardModel from "../models/card.model";
+import { convertToObjectIdMongodb } from "../utils";
 
 export const createUserCard = async ({ userId, product }: TCreateUserCard) => {
   const query = { userId: userId, state: ECardState.Active };
@@ -35,4 +36,13 @@ export const updateUserCardQuantity = async ({
   const options = { upsert: true, new: true };
 
   return await cardModel.findOneAndUpdate(query, updateSet, options);
+};
+
+export const findCardById = async (cardId: string) => {
+  return await cardModel
+    .findOne({
+      _id: convertToObjectIdMongodb(cardId),
+      state: ECardState.Active,
+    })
+    .lean();
 };
