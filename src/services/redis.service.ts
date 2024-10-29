@@ -1,6 +1,6 @@
 "use strict";
 
-import redis from "redis";
+import * as redis from 'redis';
 import { promisify } from "util";
 import { reserveInventory } from "../repositories/inventory.repo";
 
@@ -22,7 +22,6 @@ export const acquireLock = async (
   for (let i = 0; i < retryTimes; i++) {
     // Tạo 1 key, ai nằm giữ key này thì sẽ được vào thanh toán
     const result = await setnxAsync(key, expireTime);
-    console.log(result, "===result===");
     if (result === 1) {
       // Thao tac voi inventory
       const isReservation = await reserveInventory({productId, cardId, quantity})
