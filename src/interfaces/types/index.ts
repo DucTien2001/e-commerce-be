@@ -8,3 +8,4 @@ export * from './discount.type';
 export * from './card.type';
 export * from './checkout.type';
 export * from './comment.type';
+export * from './notification.type';

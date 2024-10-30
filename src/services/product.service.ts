@@ -1,17 +1,18 @@
-import { Types } from 'mongoose';
-import { BadRequestError } from '../core/error.response';
+import { Types } from "mongoose";
+import { BadRequestError } from "../core/error.response";
 import {
+  ENotiType,
   EProductType,
   TFindAllProductsForShop,
   TFindPagination,
   TFindProduct,
   TPublishProductByShop,
   TUnPublishProductByShop,
-} from '../interfaces';
-import productModel from '../models/product.model';
-import clothesModel from '../models/productAttributes/clothes.model';
-import electronicModel from '../models/productAttributes/electronic.model';
-import furnitureModel from '../models/productAttributes/furniture.model';
+} from "../interfaces";
+import productModel from "../models/product.model";
+import clothesModel from "../models/productAttributes/clothes.model";
+import electronicModel from "../models/productAttributes/electronic.model";
+import furnitureModel from "../models/productAttributes/furniture.model";
 import {
   finAllDraftsForShop,
   finAllPublishForShop,
@@ -21,9 +22,10 @@ import {
   searchProductByUser,
   unPublishProductByShop,
   updateProductById,
-} from '../repositories/product.repo';
-import { removeUndefinedObject, updateNestedObjectParser } from '../utils';
-import { insertInventory } from '../repositories/inventory.repo';
+} from "../repositories/product.repo";
+import { removeUndefinedObject, updateNestedObjectParser } from "../utils";
+import { insertInventory } from "../repositories/inventory.repo";
+import NotificationService from "./notification.service";
 
 // define Factory class to create product, using fatory and strategy pattern
 class ProductService {
@@ -48,7 +50,6 @@ class ProductService {
     payload: TProductConstructor
   ) {
     const productClass = ProductService.productRegistry[type];
-    console.log(payload, '=======payload====');
 
     if (!productClass)
       throw new BadRequestError(`Invalid Product Type ${type}`);
@@ -81,7 +82,7 @@ class ProductService {
 
   static async findAllProducts({
     limit = 50,
-    sort = 'ctime',
+    sort = "ctime",
     page = 1,
     filter = { isPublished: true },
   }: TFindPagination) {
@@ -90,12 +91,12 @@ class ProductService {
       sort,
       filter,
       page,
-      select: ['name', 'price', 'thumb', 'shop'],
+      select: ["name", "price", "thumb", "shop"],
     });
   }
 
   static async findProduct({ productId }: TFindProduct) {
-    return await findProduct({ productId, unSelect: ['__v'] });
+    return await findProduct({ productId, unSelect: ["__v"] });
   }
 
   // PUT
@@ -159,6 +160,19 @@ class Product {
         shopId: this.shop,
         stock: this.quantity,
       });
+
+      // push noti to system collection
+      NotificationService.pushNotiToSystem({
+        type: ENotiType.Shop_001,
+        senderId: this.shop,
+        receiverId: 1,
+        options: {
+          name: this.name,
+          shopId: this.shop,
+        },
+      })
+        .then((res) => console.log(res, "===res==="))
+        .catch((err) => console.log(err, "====err==="));
     }
 
     return newProduct;
@@ -182,10 +196,10 @@ class Clothes extends Product {
       ...this.attributes,
       shop: this.shop,
     });
-    if (!newClothes) throw new BadRequestError('Create new clothing error');
+    if (!newClothes) throw new BadRequestError("Create new clothing error");
 
     const newProduct = await super.createProduct(newClothes._id);
-    if (!newProduct) throw new BadRequestError('Create new product error');
+    if (!newProduct) throw new BadRequestError("Create new product error");
 
     return newProduct;
   }
@@ -220,10 +234,10 @@ class Electronic extends Product {
       shop: this.shop,
     });
     if (!newElectronic)
-      throw new BadRequestError('Create new electronic error');
+      throw new BadRequestError("Create new electronic error");
 
     const newProduct = await super.createProduct(newElectronic._id);
-    if (!newProduct) throw new BadRequestError('Create new product error');
+    if (!newProduct) throw new BadRequestError("Create new product error");
 
     return newProduct;
   }
@@ -231,7 +245,7 @@ class Electronic extends Product {
   async updateProduct(productId: string) {
     // 1. remove attribute is null, underfine
     const objectParams = removeUndefinedObject(this);
-    console.log(objectParams, '===objectParams===');
+    console.log(objectParams, "===objectParams===");
     // 2. Check xem update o cho nao?
     if (objectParams.attributes) {
       // update child
@@ -241,7 +255,7 @@ class Electronic extends Product {
           payload: updateNestedObjectParser(objectParams.attributes),
           model: electronicModel,
         },
-        '=== child ====='
+        "=== child ====="
       );
       return await updateProductById({
         productId: new Types.ObjectId(productId),
@@ -266,10 +280,10 @@ class Furniture extends Product {
       ...this.attributes,
       shop: this.shop,
     });
-    if (!newFurniture) throw new BadRequestError('Create new furniture error');
+    if (!newFurniture) throw new BadRequestError("Create new furniture error");
 
     const newProduct = await super.createProduct(newFurniture._id);
-    if (!newProduct) throw new BadRequestError('Create new product error');
+    if (!newProduct) throw new BadRequestError("Create new product error");
 
     return newProduct;
   }

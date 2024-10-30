@@ -4,9 +4,9 @@
     PROMOTION-001: có khuyến mãi mới
     SHOP-001: có sản phẩm mới
 */
-export const NotiType = {
-  Order_001: "ORDER-001",
-  Order_002: "ORDER-002",
-  Promotion_001: "PROMOTION-001",
-  Shop_001: "SHOP-001",
-};
+export enum ENotiType {
+  Order_001 = "ORDER-001",
+  Order_002 = "ORDER-002",
+  Promotion_001 = "PROMOTION-001",
+  Shop_001 = "SHOP-001",
+}
